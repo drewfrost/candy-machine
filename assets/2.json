@@ -1,0 +1,19 @@
+{
+  "name": "runduk",
+  "symbol": "",
+  "image": "2.png",
+  "properties": {
+    "files": [
+      {
+        "uri": "2.png",
+        "type": "image/png"
+      }
+    ],
+    "creators": [
+      {
+        "address": "7113d7iZQbh9xrGjKGETECav1NGPwcXe7kxMd6JojRPA",
+        "share": 100
+      }
+    ]
+  }
+}
