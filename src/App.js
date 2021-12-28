@@ -1,5 +1,4 @@
 import './App.css';
-import CandyMachine from './CandyMachine';
 import { useEffect, useState } from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 
@@ -61,7 +60,6 @@ function App() {
           <p className="sub-text">NFT drop machine with fair mint</p>
           {!walletAddress && renderNotConnectedContainer()}
         </div>
-        {walletAddress && <CandyMachine walletAddress={window.solana} />}
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
           <a
@@ -69,7 +67,7 @@ function App() {
             href={TWITTER_LINK}
             target="_blank"
             rel="noreferrer"
-          >{`built on @${TWITTER_HANDLE}`}</a>
+          >{`built by @${TWITTER_HANDLE}`}</a>
         </div>
       </div>
     </div>
