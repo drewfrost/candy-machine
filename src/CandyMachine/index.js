@@ -8,7 +8,7 @@ import {
   candyMachineProgram,
   TOKEN_METADATA_PROGRAM_ID,
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-} from './helper';
+} from './helpers';
 const {
   metadata: { Metadata, MetadataProgram },
 } = programs;

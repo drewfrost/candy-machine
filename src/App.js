@@ -10,6 +10,7 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 function App() {
   const [walletAddress, setWalletAddress] = useState('');
   useEffect(() => {
+    console.log(process.env.REACT_APP_CANDY_MACHINE_ID);
     const onLoad = async () => {
       await checkIfWalletIsConnected();
     };
