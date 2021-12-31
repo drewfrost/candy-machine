@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program, Provider, web3 } from '@project-serum/anchor';
 import { MintLayout, TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
@@ -25,6 +25,8 @@ const MAX_SYMBOL_LENGTH = 10;
 const MAX_CREATOR_LEN = 32 + 1 + 1;
 
 const CandyMachine = ({ walletAddress }) => {
+  const [machineStats, setMachineStats] = useState(null);
+  const [mints, setMints] = useState([]);
   useEffect(() => {
     getCandyMachineState();
   }, []);
@@ -64,6 +66,13 @@ const CandyMachine = ({ walletAddress }) => {
 
     // We will be using this later in our UI so let's generate this now
     const goLiveDateTimeString = `${new Date(goLiveData * 1000).toGMTString()}`;
+    setMachineStats({
+      itemsAvailable,
+      itemsRedeemed,
+      itemsRemaining,
+      goLiveData,
+      goLiveDateTimeString,
+    });
 
     console.log({
       itemsAvailable,
@@ -72,8 +81,39 @@ const CandyMachine = ({ walletAddress }) => {
       goLiveData,
       goLiveDateTimeString,
     });
+    const data = await fetchHashTable(
+      process.env.REACT_APP_CANDY_MACHINE_ID,
+      true
+    );
+
+    if (data.length !== 0) {
+      const requests = data.map(async (mint) => {
+        // Get URI
+        try {
+          const response = await fetch(mint.data.uri);
+          const parse = await response.json();
+          console.log('Past Minted NFT', mint);
+
+          // Get image URI
+          return parse.image;
+        } catch (e) {
+          // If any request fails, we'll just disregard it and carry on
+          console.error('Failed retrieving Minted NFT', mint);
+          return null;
+        }
+      });
+
+      // Wait for all requests to finish
+      const allMints = await Promise.all(requests);
+
+      // Filter requests that failed
+      const filteredMints = allMints.filter((mint) => mint !== null);
+
+      // Store all the minted image URIs
+      setMints(filteredMints);
+    }
   };
-  // Actions
+
   const fetchHashTable = async (hash, metadataEnabled) => {
     const connection = new web3.Connection(
       process.env.REACT_APP_SOLANA_RPC_HOST
@@ -219,7 +259,7 @@ const CandyMachine = ({ walletAddress }) => {
         ),
       ];
 
-      const provider = Provider.getProvider();
+      const provider = getProvider();
       const idl = await Program.fetchIdl(candyMachineProgram, provider);
       const program = new Program(idl, candyMachineProgram, provider);
 
@@ -247,6 +287,7 @@ const CandyMachine = ({ walletAddress }) => {
         { commitment: 'processed' }
       );
     } catch (error) {
+      console.error(error);
       let message = error.msg || 'Minting failed! Please try again!';
 
       if (!error.msg) {
@@ -299,13 +340,15 @@ const CandyMachine = ({ walletAddress }) => {
   };
 
   return (
-    <div className="machine-container">
-      <p>Drop Date:</p>
-      <p>Items Minted:</p>
-      <button className="cta-button mint-button" onClick={mintToken}>
-        Mint NFT
-      </button>
-    </div>
+    machineStats && (
+      <div className="machine-container">
+        <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>
+        <p>{`Items Minted: ${machineStats.itemsRedeemed} / ${machineStats.itemsAvailable}`}</p>
+        <button className="cta-button mint-button" onClick={mintToken}>
+          Mint NFT
+        </button>
+      </div>
+    )
   );
 };
 
