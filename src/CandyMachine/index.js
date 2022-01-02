@@ -27,6 +27,8 @@ const MAX_CREATOR_LEN = 32 + 1 + 1;
 const CandyMachine = ({ walletAddress }) => {
   const [machineStats, setMachineStats] = useState(null);
   const [mints, setMints] = useState([]);
+  const [isMinting, setIsMinting] = useState(false);
+  const [isLoadingMints, setIsLoadingMints] = useState(false);
   useEffect(() => {
     getCandyMachineState();
   }, []);
@@ -81,6 +83,8 @@ const CandyMachine = ({ walletAddress }) => {
       goLiveData,
       goLiveDateTimeString,
     });
+
+    setIsLoadingMints(true);
     const data = await fetchHashTable(
       process.env.REACT_APP_CANDY_MACHINE_ID,
       true
@@ -93,6 +97,7 @@ const CandyMachine = ({ walletAddress }) => {
           const response = await fetch(mint.data.uri);
           const parse = await response.json();
           console.log('Past Minted NFT', mint);
+          console.log('Response', parse);
 
           // Get image URI
           return parse.image;
@@ -112,6 +117,7 @@ const CandyMachine = ({ walletAddress }) => {
       // Store all the minted image URIs
       setMints(filteredMints);
     }
+    setIsLoadingMints(false);
   };
 
   const fetchHashTable = async (hash, metadataEnabled) => {
@@ -197,6 +203,7 @@ const CandyMachine = ({ walletAddress }) => {
 
   const mintToken = async () => {
     try {
+      setIsMinting(true);
       const mint = web3.Keypair.generate();
       const token = await getTokenWallet(
         walletAddress.publicKey,
@@ -281,6 +288,8 @@ const CandyMachine = ({ walletAddress }) => {
             const { result } = notification;
             if (!result.err) {
               console.log('NFT Minted!');
+              setIsMinting(false);
+              await getCandyMachineState();
             }
           }
         },
@@ -290,6 +299,7 @@ const CandyMachine = ({ walletAddress }) => {
       console.error(error);
       let message = error.msg || 'Minting failed! Please try again!';
 
+      setIsMinting(false);
       if (!error.msg) {
         if (error.message.indexOf('0x138')) {
         } else if (error.message.indexOf('0x137')) {
@@ -339,14 +349,33 @@ const CandyMachine = ({ walletAddress }) => {
     });
   };
 
+  const renderMintedItems = () => (
+    <div className="gif-container">
+      <p className="sub-text">Minted Items ✨</p>
+      <div className="gif-grid">
+        {mints.map((mint) => (
+          <div className="gif-item" key={mint}>
+            <img src={mint} alt={`Minted NFT ${mint}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     machineStats && (
       <div className="machine-container">
         <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>
         <p>{`Items Minted: ${machineStats.itemsRedeemed} / ${machineStats.itemsAvailable}`}</p>
-        <button className="cta-button mint-button" onClick={mintToken}>
+        <button
+          className="cta-button mint-button"
+          onClick={mintToken}
+          disabled={isMinting}
+        >
           Mint NFT
         </button>
+        {isLoadingMints && <p>LOADING MINTS...</p>}
+        {mints.length > 0 && renderMintedItems()}
       </div>
     )
   );
