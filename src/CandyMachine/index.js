@@ -32,6 +32,7 @@ const CandyMachine = ({ walletAddress }) => {
   const [isLoadingMints, setIsLoadingMints] = useState(false);
   useEffect(() => {
     getCandyMachineState();
+    // eslint-disable-next-line
   }, []);
   const getProvider = () => {
     const rpcHost = process.env.REACT_APP_SOLANA_RPC_HOST;

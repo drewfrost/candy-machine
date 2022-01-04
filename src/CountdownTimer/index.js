@@ -10,7 +10,6 @@ const CountdownTimer = ({ dropDate }) => {
       const currentDate = new Date().getTime();
       const distance = dropDate - currentDate;
 
-      
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor(
         (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
@@ -18,9 +17,7 @@ const CountdownTimer = ({ dropDate }) => {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-
       setTimerString(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-
 
       if (distance < 0) {
         console.log('Clearing interval...');
@@ -33,6 +30,7 @@ const CountdownTimer = ({ dropDate }) => {
         clearInterval(interval);
       }
     };
+    // eslint-disable-next-line
   }, []);
   
 
