@@ -64,6 +64,7 @@ function App() {
         </div>
         {walletAddress && <CandyMachine walletAddress={window.solana} />}
         <div className="footer-container">
+          
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
           <a
             className="footer-text"
