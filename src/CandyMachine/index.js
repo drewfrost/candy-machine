@@ -13,8 +13,12 @@ import {
 const {
   metadata: { Metadata, MetadataProgram },
 } = programs;
-
-const config = new web3.PublicKey(process.env.REACT_APP_CANDY_MACHINE_CONFIG);
+const CANDY_MACHINE_CONFIG = '4b24YAa2uCabdsoVfX3MALfKD7gqQLzT8seGpdb4tBym';
+const CANDY_MACHINE_ID = '5rJqzVFUpJm7PoiMiJc7mc7sFEDhCgtNjTkdunsfBfzd';
+const TREASURY_ADDRESS = '7113d7iZQbh9xrGjKGETECav1NGPwcXe7kxMd6JojRPA';
+const SOLANA_NETWORK = 'devnet';
+const SOLANA_RPC_HOST = 'https://explorer-api.devnet.solana.com';
+const config = new web3.PublicKey(CANDY_MACHINE_CONFIG);
 const { SystemProgram } = web3;
 const opts = {
   preflightCommitment: 'processed',
@@ -76,7 +80,7 @@ const CandyMachine = ({ walletAddress }) => {
 
     // Fetch the metadata from your candy machine
     const candyMachine = await program.account.candyMachine.fetch(
-      process.env.REACT_APP_CANDY_MACHINE_ID
+      CANDY_MACHINE_ID
     );
 
     // Parse out all our metadata and log it out
@@ -141,7 +145,7 @@ const CandyMachine = ({ walletAddress }) => {
 
   const fetchHashTable = async (hash, metadataEnabled) => {
     const connection = new web3.Connection(
-      process.env.REACT_APP_SOLANA_RPC_HOST
+      SOLANA_RPC_HOST
     );
 
     const metadataAccounts = await MetadataProgram.getProgramAccounts(
@@ -240,7 +244,7 @@ const CandyMachine = ({ walletAddress }) => {
         config,
         candyMachine: process.env.REACT_APP_CANDY_MACHINE_ID,
         payer: walletAddress.publicKey,
-        wallet: process.env.REACT_APP_TREASURY_ADDRESS,
+        wallet: TREASURY_ADDRESS,
         mint: mint.publicKey,
         metadata,
         masterEdition,
